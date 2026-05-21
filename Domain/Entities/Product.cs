@@ -9,6 +9,7 @@
         public int Stock { get; set; }
         public DateTimeOffset Created { get; set; }
         public DateTimeOffset Updated { get; set; }
+        public Category Category { get; set; }
         public int CategoryId { get; set; }
 
     }
