@@ -10,7 +10,7 @@ namespace Application.Interfaces
         Task<List<Category>> GetAllCategories();
         Task<Category> GetCategoryById(int id);
         Task DeleteCategory(int id);
-        Task<Category> CreateCategory(Category product);
-        Task<Category> UpdateCategory(Category product);
+        Task<Category> CreateCategory(Category category);
+        Task<Category> UpdateCategory(Category category);
     }
 }
