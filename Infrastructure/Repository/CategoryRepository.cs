@@ -1,34 +1,45 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Infrastructure.Repository
 {
     public class CategoryRepository : ICategoryRepository
     {
-        public Task<Category> CreateCategory(Category product)
+        private readonly AppDbContext _context;
+        public CategoryRepository(AppDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
+        }
+        public async Task<Category> CreateCategory(Category category)
+        {
+            await _context.Categories.AddAsync(category);
+            await _context.SaveChangesAsync();
+            return category;
         }
 
-        public Task DeleteCategory(int id)
+        public async Task DeleteCategory(int id)
         {
-            throw new NotImplementedException();
+         await _context.Categories.Where(c => c.Id == id).ExecuteDeleteAsync();
         }
 
-        public Task<List<Category>> GetAllCategories()
+        public async Task<List<Category>> GetAllCategories()
         {
-            throw new NotImplementedException();
+            return await _context.Categories.ToListAsync();
         }
 
-        public Task<Category> GetCategoryById(int id)
+        public async Task<Category> GetCategoryById(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public Task<Category> UpdateCategory(Category product)
+        public async Task<Category> UpdateCategory(Category category)
         {
-            throw new NotImplementedException();
+            _context.Categories.Update(category);
+            await _context.SaveChangesAsync();
+            return category;
         }
     }
 }
