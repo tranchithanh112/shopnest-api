@@ -1,32 +1,43 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 namespace Infrastructure.Repository
 {
     public class ProductRepository : IProductRepository
     {
-        public Task<Product> CreateProduct(Product product)
+        private readonly AppDbContext _context;
+        public ProductRepository(AppDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
+        }
+        public async Task<Product> CreateProduct(Product product)
+        {
+            await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync();
+            return product;
         }
 
-        public Task DeleteProduct(int id)
+        public async Task DeleteProduct(int id)
         {
-            throw new NotImplementedException();
+            await _context.Products.Where(p => p.Id == id).ExecuteDeleteAsync();
         }
 
-        public Task<List<Product>> GetAllProducts()
+        public async Task<List<Product>> GetAllProducts()
         {
-            throw new NotImplementedException();
+            return await _context.Products.Include(p => p.Category).ToListAsync();
         }
 
-        public Task<Product> GetProductById(int id)
+        public async Task<Product> GetProductById(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public Task<Product> UpdateProduct(Product product)
+        public async Task<Product> UpdateProduct(Product product)
         {
-            throw new NotImplementedException();
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+            return product;
         }
     }
 }

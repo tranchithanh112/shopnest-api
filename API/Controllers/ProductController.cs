@@ -8,39 +8,41 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
     {
-        private readonly ProductService _productSerivce;
-        public ProductController(ProductService productSerivce)
+        private readonly ProductService _productService;
+        public ProductController(ProductService productService)
         {
-            _productSerivce = productSerivce;
+            _productService = productService;
         }
         [HttpGet]
         public async Task<ActionResult<List<Product>>> GetAll()
         {
-            var products = await _productSerivce.GetAllProducts();
+            var products = await _productService.GetAllProducts();
             return Ok(products);
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> Get(int id) 
         { 
-            var product = await _productSerivce.GetProductById(id);
+            var product = await _productService.GetProductById(id);
+            if (product == null) return NotFound();
             return Ok(product);
         }
         [HttpPost]
         public async Task<ActionResult<Product>> Create(Product product)
         {
-            var result = await _productSerivce.CreateProduct(product);
-            return Ok(result);
+            var result = await _productService.CreateProduct(product);
+            return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
         }
-        [HttpPut]
-        public async Task<ActionResult<Product>> Update(Product product)
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Product>> Update(int id, Product product)
         {
-            var result = await _productSerivce.UpdateProduct(product);
+            if (id != product.Id) return BadRequest();
+            var result = await _productService.UpdateProduct(product);
             return Ok(result);
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id) 
         {
-            await _productSerivce.DeleteProduct(id);
+            await _productService.DeleteProduct(id);
             return NoContent();
         }
         

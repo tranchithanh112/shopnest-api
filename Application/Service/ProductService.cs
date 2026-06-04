@@ -10,7 +10,7 @@ namespace Application.Service
         {
             _productRepository = productRepository;
         }
-        public Task<Product> CreateProduct(Product product)
+        public async Task<Product> CreateProduct(Product product)
         {
             if(product.Price <= 0)
             {
@@ -21,22 +21,26 @@ namespace Application.Service
                 throw new ArgumentException("Stock must be greater than or equal to 0");
             }
             product.Created = DateTimeOffset.UtcNow;
-            return _productRepository.CreateProduct(product);
+            return await _productRepository.CreateProduct(product);
         }
-        public  Task<List<Product>> GetAllProducts()
+        public async Task<List<Product>> GetAllProducts()
         {
-            return _productRepository.GetAllProducts();
+            return await _productRepository.GetAllProducts();
         }
-        public Task<Product> GetProductById(int id)
-        {        
-            return _productRepository.GetProductById(id);
-        }
-        public Task DeleteProduct(int id)
+        public async Task<Product> GetProductById(int id)
         {
-            return _productRepository.DeleteProduct(id);
+            return await _productRepository.GetProductById(id);
         }
-        public Task<Product> UpdateProduct(Product product)
+        public async Task DeleteProduct(int id)
         {
+            var existingProduct = await _productRepository.GetProductById(id)
+            ?? throw new ArgumentException("Product not found");
+            await _productRepository.DeleteProduct(id);
+        }
+        public async Task<Product> UpdateProduct(Product product)
+        {
+            var existingProduct = await _productRepository.GetProductById(product.Id)
+            ?? throw new ArgumentException("Product not found");
             if (product.Price <= 0)
             {
                 throw new ArgumentException("Price must greater than 0");
@@ -46,7 +50,8 @@ namespace Application.Service
                 throw new ArgumentException("Stock must be greater than or equal to 0");
             }
             product.Updated = DateTimeOffset.UtcNow;
-            return _productRepository.UpdateProduct(product);
+            await _productRepository.UpdateProduct(product);
+            return product;
         }
     }
 }
