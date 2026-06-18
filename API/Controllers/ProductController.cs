@@ -1,5 +1,6 @@
-﻿using Application.Service;
-using Domain.Entities;
+﻿using Application.DTOs.Product;
+using Application.Service;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -14,29 +15,30 @@ namespace API.Controllers
             _productService = productService;
         }
         [HttpGet]
-        public async Task<ActionResult<List<Product>>> GetAll()
+        public async Task<ActionResult<List<ProductResponse>>> GetAll()
         {
+
             var products = await _productService.GetAllProducts();
+
             return Ok(products);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> Get(int id) 
+        public async Task<ActionResult<ProductResponse>> Get(int id) 
         { 
             var product = await _productService.GetProductById(id);
             if (product == null) return NotFound();
             return Ok(product);
         }
         [HttpPost]
-        public async Task<ActionResult<Product>> Create(Product product)
+        public async Task<ActionResult<ProductResponse>> Create(CreateProductRequest product)
         {
             var result = await _productService.CreateProduct(product);
             return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
         }
         [HttpPut("{id}")]
-        public async Task<ActionResult<Product>> Update(int id, Product product)
+        public async Task<ActionResult<ProductResponse>> Update(int id, UpdateProductRequest product)
         {
-            if (id != product.Id) return BadRequest();
-            var result = await _productService.UpdateProduct(product);
+            var result = await _productService.UpdateProduct(id,product);
             return Ok(result);
         }
         [HttpDelete("{id}")]

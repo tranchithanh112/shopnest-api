@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Domain.Entities;
 using Application.Service;
+using Application.DTOs.Category;
+using AutoMapper;
 
 namespace API.Controllers
 {
@@ -10,20 +12,21 @@ namespace API.Controllers
     {
         private readonly CategoryService _categoryService;
 
+
         public CategoriesController(CategoryService categoryService)
         {
             _categoryService = categoryService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Category>>> GetAll()
+        public async Task<ActionResult<List<CategoryResponse>>> GetAll()
         {
             var categories = await _categoryService.GetAllCategories();
             return Ok(categories);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Category>> Get(int id)
+        public async Task<ActionResult<CategoryResponse>> Get(int id)
         {
             var category = await _categoryService.GetCategoryById(id);
             if (category == null) return NotFound();
@@ -31,17 +34,16 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Category>> Create(Category category)
+        public async Task<ActionResult<CategoryResponse>> Create(CreateCategoryRequest createCategoryRequest)
         {
-            var createdCategory = await _categoryService.CreateCategory(category);
+            var createdCategory = await _categoryService.CreateCategory(createCategoryRequest);
             return CreatedAtAction(nameof(Get), new { id = createdCategory.Id }, createdCategory);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateCategory(int id, Category category)
+        public async Task<ActionResult> UpdateCategory(int id, UpdateCategoryRequest updateCategoryRequest)
         {
-            if (id != category.Id) return BadRequest();
-            var updatedCategory = await _categoryService.UpdateCategory(category);
+            var updatedCategory = await _categoryService.UpdateCategory(id, updateCategoryRequest);
             return Ok(updatedCategory);
         }
 
